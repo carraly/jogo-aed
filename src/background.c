@@ -92,7 +92,12 @@ static void SpawnHouse(Background *bg)
 
     house->variant = variant;
     house->setNumber = GetRandomValue(1, ASSET_COUNT);
-    house->x = bg->rightEdge;
+
+    int gap = 0;
+    if (bg->count > 0 && GetRandomValue(1, 100) > HOUSE_TOUCH_CHANCE)
+        gap = GetRandomValue(HOUSE_GAP_MIN_NATIVE, HOUSE_GAP_MAX_NATIVE) * ART_SCALE;
+
+    house->x = bg->rightEdge + gap;
     house->y = GROUND_Y - def->height * ART_SCALE;
     house->hasRail = def->hasRailRow && GetRandomValue(1, 100) <= RAIL_CHANCE;
     house->railStyle = GetRandomValue(1, ASSET_COUNT);
