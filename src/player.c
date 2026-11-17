@@ -10,7 +10,9 @@ static const Color DUCK_COLORS[DUCK_FRAMES] = {
     (Color){ 85, 145, 75, 255 }
 };
 
-static const Color JUMP_COLOR = (Color){ 190, 130, 80, 255 };
+static const Color JUMP_COLORS[JUMP_FRAMES] = {
+    (Color){ 190, 130, 80, 255 }
+};
 
 void PlayerReset(Player *player)
 {
@@ -78,7 +80,7 @@ void PlayerDraw(const Player *player)
     float height = player->ducking ? HITBOX_DUCK_HEIGHT : PLAYER_DRAW_SIZE;
     Color color;
 
-    if (!player->onGround) color = JUMP_COLOR;
+    if (!player->onGround) color = JUMP_COLORS[player->frame % JUMP_FRAMES];
     else if (player->ducking) color = DUCK_COLORS[player->frame % DUCK_FRAMES];
     else color = RUN_COLORS[player->frame % RUN_FRAMES];
 

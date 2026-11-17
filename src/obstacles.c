@@ -140,7 +140,8 @@ static void SpawnNext(ObstacleSystem *obs)
     ListAppend(&obs->active, node);
 
     obs->lastObstacleWidth = node->w;
-    obs->gapFactor = GAP_FACTOR_MIN + GetRandomValue(0, 600) / 1000.0f;
+    obs->gapFactor = GAP_FACTOR_MIN +
+        GetRandomValue(0, (int)((GAP_FACTOR_MAX - GAP_FACTOR_MIN) * 1000.0f)) / 1000.0f;
     obs->distSinceSpawn = 0.0f;
 
     if (!obs->pending.head) GenerateWave(obs);
