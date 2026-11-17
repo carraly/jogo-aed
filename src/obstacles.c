@@ -2,10 +2,12 @@
 #include <stdlib.h>
 
 static const Color OBSTACLE_COLORS[3] = {
-    (Color){ 140, 70, 40, 255 },
-    (Color){ 90, 60, 40, 255 },
-    (Color){ 70, 90, 140, 255 }
+    (Color){ 225, 45, 35, 255 },
+    (Color){ 115, 45, 170, 255 },
+    (Color){ 250, 205, 30, 255 }
 };
+
+static const Color OBSTACLE_OUTLINE = (Color){ 25, 25, 25, 255 };
 
 static void ListAppend(ObstacleList *list, ObstacleNode *node)
 {
@@ -206,12 +208,9 @@ void ObstaclesDraw(const ObstacleSystem *obs)
 {
     for (ObstacleNode *node = obs->active.head; node; node = node->next)
     {
-        DrawRectangle(
-            (int)node->x,
-            (int)node->y,
-            (int)node->w,
-            (int)node->h,
-            OBSTACLE_COLORS[node->type]
-        );
+        Rectangle rect = { node->x, node->y, node->w, node->h };
+
+        DrawRectangleRec(rect, OBSTACLE_COLORS[node->type]);
+        DrawRectangleLinesEx(rect, 3, OBSTACLE_OUTLINE);
     }
 }
