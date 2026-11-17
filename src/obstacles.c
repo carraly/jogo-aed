@@ -2,22 +2,22 @@
 #include <math.h>
 #include <stdlib.h>
 
+#ifndef DEBUG_HITBOXES
+#define DEBUG_HITBOXES 0
+#endif
+
 typedef struct {
-    float offsetX, offsetY, width, height;
+    float x, y, w, h;
 } HitboxDef;
 
-static const HitboxDef HITBOXES[3] = {
-    { 3.0f, 6.0f, OBS_SMALL_HITBOX_WIDTH, OBS_SMALL_HITBOX_HEIGHT },
-    { 0.0f, 0.0f, OBS_TALL_WIDTH, OBS_TALL_HEIGHT },
-    { 0.0f, 0.0f, OBS_AIR_WIDTH, OBS_AIR_HEIGHT }
+static const HitboxDef OBSTACLE_HITBOXES[OBS_TYPE_COUNT] = {
+    { 3.0f, 3.0f, 30.0f, 23.0f },
+    { 3.0f, 3.0f, 28.0f, 35.0f },
+    { 0.0f, 0.0f, 0.0f, 0.0f },
+    { 4.0f, 4.0f, 51.0f, 16.0f }
 };
 
-static const Color OBSTACLE_COLORS[3] = {
-    (Color){ 225, 45, 35, 255 },
-    (Color){ 115, 45, 170, 255 },
-    (Color){ 250, 205, 30, 255 }
-};
-
+static const Color AIR_COLOR = (Color){ 250, 205, 30, 255 };
 static const Color OBSTACLE_OUTLINE = (Color){ 25, 25, 25, 255 };
 
 static void ListAppend(ObstacleList *list, ObstacleNode *node)
@@ -118,6 +118,8 @@ static void GenerateWave(ObstacleSystem *obs)
         ListAppend(&obs->pending, NewObstacle(OBS_TALL));
     for (int i = 0; i < WAVE_AIR; i++)
         ListAppend(&obs->pending, NewObstacle(OBS_AIR));
+    for (int i = 0; i < WAVE_LONG; i++)
+        ListAppend(&obs->pending, NewObstacle(OBS_LONG));
 
     InsertionSortAscending(&obs->pending);
 }
@@ -139,14 +141,21 @@ static void SpawnNext(ObstacleSystem *obs)
             node->y = GROUND_Y - OBS_SMALL_SPRITE_HEIGHT;
             break;
         case OBS_TALL:
-            node->w = OBS_TALL_WIDTH;
-            node->h = OBS_TALL_HEIGHT;
-            node->y = GROUND_Y - OBS_TALL_HEIGHT;
+            node->w = OBS_TALL_SPRITE_WIDTH;
+            node->h = OBS_TALL_SPRITE_HEIGHT;
+            node->y = GROUND_Y - OBS_TALL_SPRITE_HEIGHT;
             break;
         case OBS_AIR:
             node->w = OBS_AIR_WIDTH;
             node->h = OBS_AIR_HEIGHT;
             node->y = OBS_AIR_TOP;
+            break;
+        case OBS_LONG:
+            node->w = OBS_LONG_SPRITE_WIDTH;
+            node->h = OBS_LONG_SPRITE_HEIGHT;
+            node->y = GROUND_Y - OBS_LONG_SPRITE_HEIGHT;
+            break;
+        default:
             break;
     }
 
@@ -205,18 +214,25 @@ void ObstaclesUpdate(ObstacleSystem *obs, float dt, float speed)
     }
 }
 
+Rectangle GetObstacleHitbox(const ObstacleNode *node)
+{
+    if (node->type == OBS_AIR)
+        return (Rectangle){ node->x + 4.0f, node->y + 4.0f, node->w - 8.0f, node->h - 8.0f };
+
+    const HitboxDef *hitbox = &OBSTACLE_HITBOXES[node->type];
+    return (Rectangle){
+        node->x + hitbox->x * ART_SCALE,
+        node->y + hitbox->y * ART_SCALE,
+        hitbox->w * ART_SCALE,
+        hitbox->h * ART_SCALE
+    };
+}
+
 bool ObstaclesCollide(const ObstacleSystem *obs, Rectangle box)
 {
     for (ObstacleNode *node = obs->active.head; node; node = node->next)
     {
-        const HitboxDef *hitbox = &HITBOXES[node->type];
-        Rectangle rect = {
-            node->x + hitbox->offsetX,
-            node->y + hitbox->offsetY,
-            hitbox->width,
-            hitbox->height
-        };
-        if (CheckCollisionRecs(box, rect)) return true;
+        if (CheckCollisionRecs(box, GetObstacleHitbox(node))) return true;
     }
     return false;
 }
@@ -225,22 +241,30 @@ void ObstaclesDraw(const ObstacleSystem *obs, const Assets *assets)
 {
     for (ObstacleNode *node = obs->active.head; node; node = node->next)
     {
-        if (node->type == OBS_SMALL)
+        if (node->type == OBS_AIR)
         {
+            Rectangle rect = { roundf(node->x), roundf(node->y), node->w, node->h };
+
+            DrawRectangleRec(rect, AIR_COLOR);
+            DrawRectangleLinesEx(rect, 3, OBSTACLE_OUTLINE);
+        }
+        else
+        {
+            Texture2D texture = assets->obstacle1;
+            if (node->type == OBS_TALL) texture = assets->obstacleTall;
+            else if (node->type == OBS_LONG) texture = assets->obstacleLong;
+
             DrawTextureEx(
-                assets->obstacle1,
+                texture,
                 (Vector2){ roundf(node->x), roundf(node->y) },
                 0.0f,
                 ART_SCALE,
                 WHITE
             );
         }
-        else
-        {
-            Rectangle rect = { roundf(node->x), roundf(node->y), node->w, node->h };
 
-            DrawRectangleRec(rect, OBSTACLE_COLORS[node->type]);
-            DrawRectangleLinesEx(rect, 3, OBSTACLE_OUTLINE);
-        }
+#if DEBUG_HITBOXES
+        DrawRectangleLinesEx(GetObstacleHitbox(node), 1.0f, RED);
+#endif
     }
 }
