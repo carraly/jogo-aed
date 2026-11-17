@@ -1,33 +1,26 @@
 #ifndef BACKGROUND_H
 #define BACKGROUND_H
 
+#include <stdbool.h>
 #include "raylib.h"
 #include "game.h"
+#include "assets.h"
 
 #define MAX_HOUSES 32
-#define HOUSE_VARIANTS 3
-#define WINDOW_VARIANTS 3
-#define DOOR_VARIANTS 3
-
-#define HOUSE_MIN_WIDTH 120
-#define HOUSE_MAX_WIDTH 220
-#define HOUSE_MIN_HEIGHT 150
-#define HOUSE_MAX_HEIGHT 250
-#define HOUSE_GAP_MAX 20
+#define HOUSE_VARIANTS 4
 #define HOUSE_SPAWN_MARGIN 50
 
-#define WINDOW_SIZE 28
-#define DOOR_WIDTH 32
-#define DOOR_HEIGHT 56
+#define RAIL_CHANCE 70
+#define RAIL_BELOW_WINDOW 11
 #define GROUND_STRIPE_WIDTH 80
 
 typedef struct {
+    int variant;
+    int setNumber;
     float x;
-    float width;
-    float height;
-    int layout;
-    int window;
-    int door;
+    float y;
+    bool hasRail;
+    int railStyle;
 } House;
 
 typedef struct {
@@ -35,11 +28,12 @@ typedef struct {
     int count;
     float rightEdge;
     float scrollX;
+    int lastVariant;
 } Background;
 
 void BackgroundReset(Background *bg);
 void BackgroundUpdate(Background *bg, float dt, float speed);
-void BackgroundDrawHouses(const Background *bg);
+void BackgroundDrawHouses(const Background *bg, const Assets *assets);
 void BackgroundDrawGround(const Background *bg);
 
 #endif

@@ -5,6 +5,7 @@
 #include "obstacles.h"
 #include "background.h"
 #include "ranking.h"
+#include "assets.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -15,6 +16,7 @@ typedef struct {
     Player player;
     ObstacleSystem obstacles;
     Background background;
+    Assets assets;
     RankList ranking;
     float elapsed;
     float score;
@@ -157,16 +159,16 @@ static void UpdateRanking(Game *game)
 static void DrawScene(const Game *game)
 {
     ClearBackground(SKY_COLOR);
-    BackgroundDrawHouses(&game->background);
+    BackgroundDrawHouses(&game->background, &game->assets);
     BackgroundDrawGround(&game->background);
-    ObstaclesDraw(&game->obstacles);
+    ObstaclesDraw(&game->obstacles, &game->assets);
     PlayerDraw(&game->player);
 }
 
 static void DrawMenu(const Game *game)
 {
     ClearBackground(SKY_COLOR);
-    BackgroundDrawHouses(&game->background);
+    BackgroundDrawHouses(&game->background, &game->assets);
     BackgroundDrawGround(&game->background);
 
     int titleWidth = MeasureText(TITLE_TEXT, 50);
@@ -282,6 +284,7 @@ int main(void)
     SetTargetFPS(60);
     SetRandomSeed((unsigned int)time(NULL));
 
+    AssetsLoad(&game.assets);
     PlayerReset(&game.player);
     BackgroundReset(&game.background);
     ObstaclesInit(&game.obstacles);
@@ -333,6 +336,7 @@ int main(void)
 
     ObstaclesFree(&game.obstacles);
     RankingFree(&game.ranking);
+    AssetsUnload(&game.assets);
     CloseWindow();
 
     return 0;

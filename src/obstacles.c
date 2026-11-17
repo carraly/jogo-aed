@@ -1,5 +1,16 @@
 #include "obstacles.h"
+#include <math.h>
 #include <stdlib.h>
+
+typedef struct {
+    float offsetX, offsetY, width, height;
+} HitboxDef;
+
+static const HitboxDef HITBOXES[3] = {
+    { 3.0f, 6.0f, OBS_SMALL_HITBOX_WIDTH, OBS_SMALL_HITBOX_HEIGHT },
+    { 0.0f, 0.0f, OBS_TALL_WIDTH, OBS_TALL_HEIGHT },
+    { 0.0f, 0.0f, OBS_AIR_WIDTH, OBS_AIR_HEIGHT }
+};
 
 static const Color OBSTACLE_COLORS[3] = {
     (Color){ 225, 45, 35, 255 },
@@ -123,9 +134,9 @@ static void SpawnNext(ObstacleSystem *obs)
     switch (node->type)
     {
         case OBS_SMALL:
-            node->w = OBS_SMALL_WIDTH;
-            node->h = OBS_SMALL_HEIGHT;
-            node->y = GROUND_Y - OBS_SMALL_HEIGHT;
+            node->w = OBS_SMALL_SPRITE_WIDTH;
+            node->h = OBS_SMALL_SPRITE_HEIGHT;
+            node->y = GROUND_Y - OBS_SMALL_SPRITE_HEIGHT;
             break;
         case OBS_TALL:
             node->w = OBS_TALL_WIDTH;
@@ -198,19 +209,38 @@ bool ObstaclesCollide(const ObstacleSystem *obs, Rectangle box)
 {
     for (ObstacleNode *node = obs->active.head; node; node = node->next)
     {
-        Rectangle rect = { node->x, node->y, node->w, node->h };
+        const HitboxDef *hitbox = &HITBOXES[node->type];
+        Rectangle rect = {
+            node->x + hitbox->offsetX,
+            node->y + hitbox->offsetY,
+            hitbox->width,
+            hitbox->height
+        };
         if (CheckCollisionRecs(box, rect)) return true;
     }
     return false;
 }
 
-void ObstaclesDraw(const ObstacleSystem *obs)
+void ObstaclesDraw(const ObstacleSystem *obs, const Assets *assets)
 {
     for (ObstacleNode *node = obs->active.head; node; node = node->next)
     {
-        Rectangle rect = { node->x, node->y, node->w, node->h };
+        if (node->type == OBS_SMALL)
+        {
+            DrawTextureEx(
+                assets->obstacle1,
+                (Vector2){ roundf(node->x), roundf(node->y) },
+                0.0f,
+                ART_SCALE,
+                WHITE
+            );
+        }
+        else
+        {
+            Rectangle rect = { roundf(node->x), roundf(node->y), node->w, node->h };
 
-        DrawRectangleRec(rect, OBSTACLE_COLORS[node->type]);
-        DrawRectangleLinesEx(rect, 3, OBSTACLE_OUTLINE);
+            DrawRectangleRec(rect, OBSTACLE_COLORS[node->type]);
+            DrawRectangleLinesEx(rect, 3, OBSTACLE_OUTLINE);
+        }
     }
 }

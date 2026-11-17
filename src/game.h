@@ -19,7 +19,7 @@
 #define GAME_OVER_LOCK 0.5f
 #define NAME_MAX_LENGTH 10
 
-#define SKY_COLOR (Color){ 120, 190, 230, 255 }
+#define SKY_COLOR (Color){ 200, 225, 245, 255 }
 #define OVERLAY_COLOR (Color){ 0, 0, 0, 140 }
 
 typedef enum {

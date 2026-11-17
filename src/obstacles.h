@@ -4,14 +4,18 @@
 #include <stdbool.h>
 #include "raylib.h"
 #include "game.h"
+#include "assets.h"
 
 #define WAVE_SIZE 15
 #define WAVE_SMALL 5
 #define WAVE_TALL 5
 #define WAVE_AIR 5
 
-#define OBS_SMALL_WIDTH 40
-#define OBS_SMALL_HEIGHT 40
+#define OBS_SMALL_SPRITE_WIDTH (38 * ART_SCALE)
+#define OBS_SMALL_SPRITE_HEIGHT (27 * ART_SCALE)
+#define OBS_SMALL_HITBOX_WIDTH 70
+#define OBS_SMALL_HITBOX_HEIGHT 48
+
 #define OBS_TALL_WIDTH 36
 #define OBS_TALL_HEIGHT 80
 #define OBS_AIR_WIDTH 40
@@ -49,6 +53,6 @@ void ObstaclesFree(ObstacleSystem *obs);
 void ObstaclesReset(ObstacleSystem *obs);
 void ObstaclesUpdate(ObstacleSystem *obs, float dt, float speed);
 bool ObstaclesCollide(const ObstacleSystem *obs, Rectangle box);
-void ObstaclesDraw(const ObstacleSystem *obs);
+void ObstaclesDraw(const ObstacleSystem *obs, const Assets *assets);
 
 #endif

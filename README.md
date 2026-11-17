@@ -18,6 +18,8 @@ Ou diretamente com o gcc:
 gcc -Wall -std=c99 -O2 -I include src/*.c -o jogo-aed.exe -L lib/windows -lraylib -lopengl32 -lgdi32 -lwinmm
 ```
 
+As texturas ficam na pasta `assets/`, que precisa estar ao lado do executável.
+
 ## Controles
 
 - Seta para cima ou Espaco: pular (segure para pular mais alto)
