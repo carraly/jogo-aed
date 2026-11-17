@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include "raylib.h"
 #include "game.h"
+#include "assets.h"
 
 #define PLAYER_X 100
 #define PLAYER_SPRITE_SIZE 32
@@ -20,10 +21,11 @@
 #define HITBOX_DUCK_HEIGHT 32
 #define HITBOX_OFFSET_X 14
 
-#define RUN_FRAMES 2
-#define DUCK_FRAMES 2
-#define JUMP_FRAMES 1
-#define ANIM_FRAME_TIME 0.12f
+#define RUN_FRAMES 8
+#define RUN_FPS 8
+#define PLAYER_FEET_PAD 2
+#define DUCK_SQUEEZE_X 1.0f
+#define DUCK_SQUEEZE_Y 0.5f
 
 typedef struct {
     float y;
@@ -37,6 +39,6 @@ typedef struct {
 void PlayerReset(Player *player);
 void PlayerUpdate(Player *player, float dt);
 Rectangle PlayerHitbox(const Player *player);
-void PlayerDraw(const Player *player);
+void PlayerDraw(const Player *player, const Assets *assets);
 
 #endif

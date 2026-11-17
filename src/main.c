@@ -11,6 +11,9 @@
 #include <string.h>
 #include <time.h>
 
+#define MENU_IDLE_X 60
+#define MENU_IDLE_SCALE 4.0f
+
 typedef struct {
     GameState state;
     Player player;
@@ -162,7 +165,7 @@ static void DrawScene(const Game *game)
     BackgroundDrawHouses(&game->background, &game->assets);
     BackgroundDrawGround(&game->background);
     ObstaclesDraw(&game->obstacles, &game->assets);
-    PlayerDraw(&game->player);
+    PlayerDraw(&game->player, &game->assets);
 }
 
 static void DrawMenu(const Game *game)
@@ -170,6 +173,14 @@ static void DrawMenu(const Game *game)
     ClearBackground(SKY_COLOR);
     BackgroundDrawHouses(&game->background, &game->assets);
     BackgroundDrawGround(&game->background);
+
+    DrawTextureEx(
+        game->assets.playerIdle,
+        (Vector2){ (float)MENU_IDLE_X, (float)(GROUND_Y - PLAYER_SPRITE_SIZE * MENU_IDLE_SCALE) },
+        0.0f,
+        MENU_IDLE_SCALE,
+        WHITE
+    );
 
     int titleWidth = MeasureText(TITLE_TEXT, 50);
     DrawText(TITLE_TEXT, (SCREEN_WIDTH - titleWidth) / 2, 80, 50, DARKBROWN);

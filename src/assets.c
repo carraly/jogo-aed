@@ -36,8 +36,20 @@ void AssetsLoad(Assets *assets)
         LoadPointTexture(&assets->railBig[i], path);
     }
 
+    snprintf(path, sizeof path, "%sassets/character/character-running.png", base);
+    LoadPointTexture(&assets->playerRun, path);
+
+    snprintf(path, sizeof path, "%sassets/character/character-idle.png", base);
+    LoadPointTexture(&assets->playerIdle, path);
+
     snprintf(path, sizeof path, "%sassets/obstacles/obstacle1.png", base);
     LoadPointTexture(&assets->obstacle1, path);
+
+    snprintf(path, sizeof path, "%sassets/obstacles/obstacle-tall1.png", base);
+    LoadPointTexture(&assets->obstacleTall, path);
+
+    snprintf(path, sizeof path, "%sassets/obstacles/obstacle-long1.png", base);
+    LoadPointTexture(&assets->obstacleLong, path);
 }
 
 void AssetsUnload(Assets *assets)
@@ -54,4 +66,8 @@ void AssetsUnload(Assets *assets)
     }
 
     UnloadTexture(assets->obstacle1);
+    UnloadTexture(assets->obstacleTall);
+    UnloadTexture(assets->obstacleLong);
+    UnloadTexture(assets->playerRun);
+    UnloadTexture(assets->playerIdle);
 }

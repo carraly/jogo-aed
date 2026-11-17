@@ -1,18 +1,5 @@
 #include "player.h"
-
-static const Color RUN_COLORS[RUN_FRAMES] = {
-    (Color){ 150, 90, 50, 255 },
-    (Color){ 175, 105, 60, 255 }
-};
-
-static const Color DUCK_COLORS[DUCK_FRAMES] = {
-    (Color){ 60, 120, 60, 255 },
-    (Color){ 85, 145, 75, 255 }
-};
-
-static const Color JUMP_COLORS[JUMP_FRAMES] = {
-    (Color){ 190, 130, 80, 255 }
-};
+#include <math.h>
 
 void PlayerReset(Player *player)
 {
@@ -29,6 +16,7 @@ void PlayerUpdate(Player *player, float dt)
     bool jumpHeld = IsKeyDown(KEY_UP) || IsKeyDown(KEY_SPACE);
     bool downHeld = IsKeyDown(KEY_DOWN);
     bool jumpPressed = IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_SPACE);
+    bool wasOnGround = player->onGround;
 
     if (jumpPressed && player->onGround && !downHeld)
     {
@@ -54,14 +42,27 @@ void PlayerUpdate(Player *player, float dt)
         player->onGround = true;
     }
 
-    player->animTimer += dt;
-    if (player->animTimer >= ANIM_FRAME_TIME)
+    if (player->onGround)
     {
-        player->animTimer -= ANIM_FRAME_TIME;
-        player->frame++;
-    }
+        if (!wasOnGround)
+        {
+            player->animTimer = 0.0f;
+            player->frame = 0;
+        }
 
-    if (!player->onGround) player->frame = 0;
+        player->animTimer += dt;
+        float frameTime = 1.0f / RUN_FPS;
+
+        while (player->animTimer >= frameTime)
+        {
+            player->animTimer -= frameTime;
+            player->frame = (player->frame + 1) % RUN_FRAMES;
+        }
+    }
+    else
+    {
+        player->frame = 0;
+    }
 }
 
 Rectangle PlayerHitbox(const Player *player)
@@ -75,14 +76,25 @@ Rectangle PlayerHitbox(const Player *player)
     };
 }
 
-void PlayerDraw(const Player *player)
+void PlayerDraw(const Player *player, const Assets *assets)
 {
-    float height = player->ducking ? HITBOX_DUCK_HEIGHT : PLAYER_DRAW_SIZE;
-    Color color;
+    float destWidth = PLAYER_DRAW_SIZE * DUCK_SQUEEZE_X;
+    float destHeight = PLAYER_DRAW_SIZE;
 
-    if (!player->onGround) color = JUMP_COLORS[player->frame % JUMP_FRAMES];
-    else if (player->ducking) color = DUCK_COLORS[player->frame % DUCK_FRAMES];
-    else color = RUN_COLORS[player->frame % RUN_FRAMES];
+    if (player->ducking) destHeight *= DUCK_SQUEEZE_Y;
 
-    DrawRectangle(PLAYER_X, (int)(player->y - height), PLAYER_DRAW_SIZE, (int)height, color);
+    float destX = PLAYER_X - (destWidth - PLAYER_DRAW_SIZE) / 2.0f;
+    float feetPad = PLAYER_FEET_PAD * ART_SCALE;
+    if (player->ducking) feetPad *= DUCK_SQUEEZE_Y;
+    float destY = player->y - destHeight + feetPad;
+
+    Rectangle source = {
+        (float)(player->frame * PLAYER_SPRITE_SIZE),
+        0.0f,
+        PLAYER_SPRITE_SIZE,
+        PLAYER_SPRITE_SIZE
+    };
+    Rectangle dest = { roundf(destX), roundf(destY), destWidth, destHeight };
+
+    DrawTexturePro(assets->playerRun, source, dest, (Vector2){ 0.0f, 0.0f }, 0.0f, WHITE);
 }
