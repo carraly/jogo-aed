@@ -27,4 +27,7 @@ As texturas ficam na pasta `assets/`, que precisa estar ao lado do executável.
 - Setas para cima e para baixo: navegar no menu
 - Enter ou Espaco: confirmar
 - Esc: voltar do ranking
+- F11: alternar janela sem bordas e tela cheia
+
+A janela pode ser redimensionada livremente e mantem a proporcao 16:9, com barras pretas quando necessario.
 

@@ -10,9 +10,15 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <math.h>
 
 #define MENU_IDLE_X 60
 #define MENU_IDLE_SCALE 4.0f
+
+#define SCALE_POINT 0
+#define SCALE_BILINEAR 1
+#define SCALE_INTEGER 2
+#define SCALE_MODE SCALE_POINT
 
 typedef struct {
     GameState state;
@@ -290,10 +296,26 @@ int main(void)
     Game game = { 0 };
     game.state = STATE_MENU;
 
-    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Corrida na Bahia");
+    InitWindow(1600, 900, "Corrida na Bahia");
+    SetWindowMinSize(400, 225);
     SetExitKey(KEY_NULL);
     SetTargetFPS(60);
     SetRandomSeed((unsigned int)time(NULL));
+
+    int monitorWidth = GetMonitorWidth(GetCurrentMonitor());
+    int monitorHeight = GetMonitorHeight(GetCurrentMonitor());
+    float windowScale = fminf(
+        (monitorWidth * 0.9f) / SCREEN_WIDTH,
+        (monitorHeight * 0.9f) / SCREEN_HEIGHT
+    );
+    if (windowScale > 2.0f) windowScale = 2.0f;
+    SetWindowSize((int)(SCREEN_WIDTH * windowScale), (int)(SCREEN_HEIGHT * windowScale));
+
+    RenderTexture2D target = LoadRenderTexture(SCREEN_WIDTH, SCREEN_HEIGHT);
+    SetTextureFilter(
+        target.texture,
+        SCALE_MODE == SCALE_BILINEAR ? TEXTURE_FILTER_BILINEAR : TEXTURE_FILTER_POINT
+    );
 
     AssetsLoad(&game.assets);
     PlayerReset(&game.player);
@@ -307,6 +329,8 @@ int main(void)
 
     while (!WindowShouldClose() && !game.exitRequested)
     {
+        if (IsKeyPressed(KEY_F11)) ToggleBorderlessWindowed();
+
         float dt = GetFrameTime();
         if (dt > 1.0f / 30.0f) dt = 1.0f / 30.0f;
 
@@ -319,7 +343,7 @@ int main(void)
             case STATE_RANKING: UpdateRanking(&game); break;
         }
 
-        BeginDrawing();
+        BeginTextureMode(target);
 
         switch (game.state)
         {
@@ -342,12 +366,43 @@ int main(void)
                 break;
         }
 
+        EndTextureMode();
+
+        float scale = fminf(
+            (float)GetScreenWidth() / SCREEN_WIDTH,
+            (float)GetScreenHeight() / SCREEN_HEIGHT
+        );
+
+#if SCALE_MODE == SCALE_INTEGER
+        if (scale >= 1.0f) scale = floorf(scale);
+#endif
+
+        float drawWidth = SCREEN_WIDTH * scale;
+        float drawHeight = SCREEN_HEIGHT * scale;
+        Rectangle destination = {
+            (GetScreenWidth() - drawWidth) / 2.0f,
+            (GetScreenHeight() - drawHeight) / 2.0f,
+            drawWidth,
+            drawHeight
+        };
+
+        BeginDrawing();
+        ClearBackground(BLACK);
+        DrawTexturePro(
+            target.texture,
+            (Rectangle){ 0.0f, 0.0f, (float)target.texture.width, -(float)target.texture.height },
+            destination,
+            (Vector2){ 0.0f, 0.0f },
+            0.0f,
+            WHITE
+        );
         EndDrawing();
     }
 
     ObstaclesFree(&game.obstacles);
     RankingFree(&game.ranking);
     AssetsUnload(&game.assets);
+    UnloadRenderTexture(target);
     CloseWindow();
 
     return 0;
