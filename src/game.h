@@ -7,7 +7,6 @@
 
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 450
-#define GROUND_Y 360
 
 #define SPEED_START 170.0f
 #define SPEED_ACCEL 4.0f
