@@ -15,8 +15,15 @@
 #define HOUSE_GAP_MAX_NATIVE 12
 
 #define RAIL_CHANCE 70
-#define RAIL_BELOW_WINDOW 11
+#define RAIL_BELOW_WINDOW 20
 #define GROUND_STRIPE_WIDTH 80
+
+typedef enum {
+    SLOT_WINDOW_SMALL,
+    SLOT_WINDOW_MEDIUM,
+    SLOT_WINDOW_BIG,
+    SLOT_DOOR
+} SlotKind;
 
 typedef struct {
     int variant;
@@ -26,6 +33,7 @@ typedef struct {
     float y;
     bool hasRail;
     int railStyle;
+    SlotKind slotKinds[8];
 } House;
 
 typedef struct {

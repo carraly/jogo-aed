@@ -37,6 +37,9 @@ void AssetsLoad(Assets *assets)
 
         snprintf(path, sizeof path, "%sassets/obstacles/obstacle-air1.png", base);
         LoadPointTexture(&assets->obstacleAir, path);
+
+        snprintf(path, sizeof path, "%sassets/windows/window-big%d.png", base, i + 1);
+        LoadPointTexture(&assets->windowBig[i], path);
     }
 
     snprintf(path, sizeof path, "%sassets/character/character-running.png", base);
@@ -79,6 +82,7 @@ void AssetsUnload(Assets *assets)
         UnloadTexture(assets->railSmall[i]);
         UnloadTexture(assets->railMedium[i]);
         UnloadTexture(assets->railBig[i]);
+        UnloadTexture(assets->windowBig[i]);
     }
 
     UnloadTexture(assets->obstacle1);
