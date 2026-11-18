@@ -16,9 +16,12 @@ typedef struct {
     Texture2D railBig[ASSET_COUNT];
     Texture2D playerRun;
     Texture2D playerIdle;
+    Texture2D playerJump;
+    Texture2D playerSlide;
     Texture2D obstacle1;
     Texture2D obstacleTall;
     Texture2D obstacleLong;
+    Texture2D obstacleAir;
 } Assets;
 
 void AssetsLoad(Assets *assets);

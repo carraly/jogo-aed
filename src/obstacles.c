@@ -17,9 +17,6 @@ static const HitboxDef OBSTACLE_HITBOXES[OBS_TYPE_COUNT] = {
     { 4.0f, 4.0f, 51.0f, 16.0f }
 };
 
-static const Color AIR_COLOR = (Color){ 250, 205, 30, 255 };
-static const Color OBSTACLE_OUTLINE = (Color){ 25, 25, 25, 255 };
-
 static void ListAppend(ObstacleList *list, ObstacleNode *node)
 {
     node->prev = list->tail;
@@ -77,6 +74,7 @@ static ObstacleNode *NewObstacle(ObstacleType type)
 {
     ObstacleNode *node = malloc(sizeof *node);
     node->sortKey = GetRandomValue(0, 9999);
+    node->animOffset = GetRandomValue(0, AIR_FRAMES - 1);
     node->type = type;
     node->x = 0.0f;
     node->y = 0.0f;
@@ -176,6 +174,7 @@ void ObstaclesInit(ObstacleSystem *obs)
     obs->distSinceSpawn = 0.0f;
     obs->lastObstacleWidth = 0.0f;
     obs->gapFactor = GAP_FACTOR_MIN;
+    obs->airTime = 0.0f;
 }
 
 void ObstaclesFree(ObstacleSystem *obs)
@@ -187,12 +186,14 @@ void ObstaclesFree(ObstacleSystem *obs)
 void ObstaclesReset(ObstacleSystem *obs)
 {
     ObstaclesFree(obs);
+    obs->airTime = 0.0f;
     GenerateWave(obs);
     SpawnNext(obs);
 }
 
 void ObstaclesUpdate(ObstacleSystem *obs, float dt, float speed)
 {
+    obs->airTime += dt;
     obs->distSinceSpawn += speed * dt;
 
     float gap = obs->lastObstacleWidth + speed * GAP_TIME * obs->gapFactor;
@@ -217,7 +218,14 @@ void ObstaclesUpdate(ObstacleSystem *obs, float dt, float speed)
 Rectangle GetObstacleHitbox(const ObstacleNode *node)
 {
     if (node->type == OBS_AIR)
-        return (Rectangle){ node->x + 4.0f, node->y + 4.0f, node->w - 8.0f, node->h - 8.0f };
+    {
+        return (Rectangle){
+            node->x + AIR_HITBOX_OFFSET_X,
+            GROUND_Y - AIR_HITBOX_TOP,
+            AIR_HITBOX_WIDTH,
+            AIR_HITBOX_TOP - AIR_HITBOX_BOTTOM
+        };
+    }
 
     const HitboxDef *hitbox = &OBSTACLE_HITBOXES[node->type];
     return (Rectangle){
@@ -239,14 +247,28 @@ bool ObstaclesCollide(const ObstacleSystem *obs, Rectangle box)
 
 void ObstaclesDraw(const ObstacleSystem *obs, const Assets *assets)
 {
+    int airFrame = (int)(obs->airTime * AIR_FPS) % AIR_FRAMES;
+
     for (ObstacleNode *node = obs->active.head; node; node = node->next)
     {
         if (node->type == OBS_AIR)
         {
-            Rectangle rect = { roundf(node->x), roundf(node->y), node->w, node->h };
+            int frame = (airFrame + node->animOffset) % AIR_FRAMES;
 
-            DrawRectangleRec(rect, AIR_COLOR);
-            DrawRectangleLinesEx(rect, 3, OBSTACLE_OUTLINE);
+            Rectangle source = {
+                (float)(frame * AIR_FRAME_SIZE),
+                0.0f,
+                AIR_FRAME_SIZE,
+                AIR_FRAME_SIZE
+            };
+            Rectangle dest = {
+                roundf(node->x),
+                roundf(node->y),
+                node->w,
+                node->h
+            };
+
+            DrawTexturePro(assets->obstacleAir, source, dest, (Vector2){ 0.0f, 0.0f }, 0.0f, WHITE);
         }
         else
         {

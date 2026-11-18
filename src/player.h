@@ -23,9 +23,10 @@
 
 #define RUN_FRAMES 8
 #define RUN_FPS 8
-#define PLAYER_FEET_PAD 2
-#define DUCK_SQUEEZE_X 1.0f
-#define DUCK_SQUEEZE_Y 0.5f
+
+#define RUN_FEET_PAD 2
+#define JUMP_FEET_PAD 5
+#define SLIDE_FEET_PAD 5
 
 typedef struct {
     float y;

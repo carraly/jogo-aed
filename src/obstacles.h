@@ -22,9 +22,17 @@
 #define OBS_TALL_SPRITE_HEIGHT (39 * ART_SCALE)
 #define OBS_LONG_SPRITE_WIDTH (59 * ART_SCALE)
 #define OBS_LONG_SPRITE_HEIGHT (21 * ART_SCALE)
-#define OBS_AIR_WIDTH 40
-#define OBS_AIR_HEIGHT 100
-#define OBS_AIR_TOP (GROUND_Y - 145)
+
+#define AIR_FRAMES 8
+#define AIR_FPS 8
+#define AIR_FRAME_SIZE 16
+#define OBS_AIR_WIDTH (AIR_FRAME_SIZE * ART_SCALE)
+#define OBS_AIR_HEIGHT (AIR_FRAME_SIZE * ART_SCALE)
+#define OBS_AIR_TOP (GROUND_Y - OBS_AIR_HEIGHT - 32)
+#define AIR_HITBOX_BOTTOM 42
+#define AIR_HITBOX_TOP 96
+#define AIR_HITBOX_OFFSET_X 6
+#define AIR_HITBOX_WIDTH 22
 
 typedef enum {
     OBS_SMALL,
@@ -36,6 +44,7 @@ typedef enum {
 
 typedef struct ObstacleNode {
     int sortKey;
+    int animOffset;
     ObstacleType type;
     float x, y, w, h;
     struct ObstacleNode *prev, *next;
@@ -52,6 +61,7 @@ typedef struct {
     float distSinceSpawn;
     float lastObstacleWidth;
     float gapFactor;
+    float airTime;
 } ObstacleSystem;
 
 void ObstaclesInit(ObstacleSystem *obs);

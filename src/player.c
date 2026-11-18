@@ -42,7 +42,7 @@ void PlayerUpdate(Player *player, float dt)
         player->onGround = true;
     }
 
-    if (player->onGround)
+    if (player->onGround && !player->ducking)
     {
         if (!wasOnGround)
         {
@@ -59,10 +59,6 @@ void PlayerUpdate(Player *player, float dt)
             player->frame = (player->frame + 1) % RUN_FRAMES;
         }
     }
-    else
-    {
-        player->frame = 0;
-    }
 }
 
 Rectangle PlayerHitbox(const Player *player)
@@ -78,23 +74,33 @@ Rectangle PlayerHitbox(const Player *player)
 
 void PlayerDraw(const Player *player, const Assets *assets)
 {
-    float destWidth = PLAYER_DRAW_SIZE * DUCK_SQUEEZE_X;
-    float destHeight = PLAYER_DRAW_SIZE;
+    Texture2D texture;
+    Rectangle source = { 0.0f, 0.0f, PLAYER_SPRITE_SIZE, PLAYER_SPRITE_SIZE };
+    float feetPad;
 
-    if (player->ducking) destHeight *= DUCK_SQUEEZE_Y;
+    if (player->ducking)
+    {
+        texture = assets->playerSlide;
+        feetPad = SLIDE_FEET_PAD * ART_SCALE;
+    }
+    else if (!player->onGround)
+    {
+        texture = assets->playerJump;
+        feetPad = JUMP_FEET_PAD * ART_SCALE;
+    }
+    else
+    {
+        texture = assets->playerRun;
+        feetPad = RUN_FEET_PAD * ART_SCALE;
+        source.x = (float)(player->frame * PLAYER_SPRITE_SIZE);
+    }
 
-    float destX = PLAYER_X - (destWidth - PLAYER_DRAW_SIZE) / 2.0f;
-    float feetPad = PLAYER_FEET_PAD * ART_SCALE;
-    if (player->ducking) feetPad *= DUCK_SQUEEZE_Y;
-    float destY = player->y - destHeight + feetPad;
-
-    Rectangle source = {
-        (float)(player->frame * PLAYER_SPRITE_SIZE),
-        0.0f,
-        PLAYER_SPRITE_SIZE,
-        PLAYER_SPRITE_SIZE
+    Rectangle dest = {
+        roundf((float)PLAYER_X),
+        roundf(player->y - PLAYER_DRAW_SIZE + feetPad),
+        PLAYER_DRAW_SIZE,
+        PLAYER_DRAW_SIZE
     };
-    Rectangle dest = { roundf(destX), roundf(destY), destWidth, destHeight };
 
-    DrawTexturePro(assets->playerRun, source, dest, (Vector2){ 0.0f, 0.0f }, 0.0f, WHITE);
+    DrawTexturePro(texture, source, dest, (Vector2){ 0.0f, 0.0f }, 0.0f, WHITE);
 }

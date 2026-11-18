@@ -23,7 +23,7 @@ As texturas ficam na pasta `assets/`, que precisa estar ao lado do executável.
 ## Controles
 
 - Seta para cima ou Espaco: pular (segure para pular mais alto)
-- Seta para baixo: agachar ou cair mais rapido no ar
+- Seta para baixo: deslizar ou cair mais rapido no ar
 - Setas para cima e para baixo: navegar no menu
 - Enter ou Espaco: confirmar
 - Esc: voltar do ranking
