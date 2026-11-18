@@ -301,7 +301,7 @@ int main(void)
     Game game = { 0 };
     game.state = STATE_MENU;
 
-    InitWindow(1600, 900, "Corrida na Bahia");
+    InitWindow(1600, 900, "Corre de Roque");
     SetWindowMinSize(400, 225);
     SetExitKey(KEY_NULL);
     SetTargetFPS(60);

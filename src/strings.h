@@ -1,7 +1,7 @@
 #ifndef STRINGS_H
 #define STRINGS_H
 
-#define TITLE_TEXT "CORRIDA NA BAHIA"
+#define TITLE_TEXT "CORRE DE ROQUE"
 #define MENU_PLAY "Jogar"
 #define MENU_RANKING "Ranking"
 #define MENU_EXIT "Sair"
