@@ -15,6 +15,8 @@ make
 make run
 ```
 
+No Windows com MinGW, use `mingw32-make` no lugar de `make`.
+
 Sem o Makefile, compile e execute direto com o gcc:
 
 ```
