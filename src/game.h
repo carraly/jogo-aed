@@ -7,7 +7,7 @@
 #define SCREEN_HEIGHT 450
 #define GROUND_Y 360
 
-#define SPEED_START 360.0f
+#define SPEED_START 220.0f
 #define SPEED_ACCEL 8.0f
 #define SPEED_MAX 800.0f
 #define SCORE_FACTOR 0.05f
