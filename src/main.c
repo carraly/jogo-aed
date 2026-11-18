@@ -188,6 +188,9 @@ static void DrawMenu(const Game *game)
         WHITE
     );
 
+    DrawRectangle(240, 180, 320, 175, (Color){ 0, 0, 0, 205 });
+    DrawRectangleLines(240, 180, 320, 175, (Color){ 255, 255, 255, 120 });
+
     int titleWidth = MeasureText(TITLE_TEXT, 50);
     DrawText(TITLE_TEXT, (SCREEN_WIDTH - titleWidth) / 2, 80, 50, DARKBROWN);
 
@@ -195,7 +198,7 @@ static void DrawMenu(const Game *game)
     for (int i = 0; i < 3; i++)
     {
         int width = MeasureText(options[i], 30);
-        Color color = i == game->menuSelection ? MAROON : DARKGRAY;
+        Color color = i == game->menuSelection ? GOLD : RAYWHITE;
         DrawText(options[i], (SCREEN_WIDTH - width) / 2, 210 + i * 50, 30, color);
     }
 }
