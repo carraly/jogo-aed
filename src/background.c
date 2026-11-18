@@ -14,6 +14,7 @@ typedef struct {
 
 typedef struct {
     int width, height;
+    int wallX, wallY, wallW, wallH;
     int slotCount;
     HouseSlot slots[8];
     int hasRailRow;
@@ -23,7 +24,7 @@ typedef struct {
 
 static const HouseDef HOUSE_DEFS[HOUSE_VARIANTS] = {
     {
-        64, 108, 6,
+        64, 108, 2, 14, 60, 94, 6,
         {
             { SLOT_WINDOW_MEDIUM, 4, 27 },
             { SLOT_WINDOW_MEDIUM, 26, 27 },
@@ -35,7 +36,7 @@ static const HouseDef HOUSE_DEFS[HOUSE_VARIANTS] = {
         1, 0, 3
     },
     {
-        48, 60, 2,
+        48, 60, 2, 14, 44, 46, 2,
         {
             { SLOT_WINDOW_SMALL, 7, 28 },
             { SLOT_DOOR, 23, 28 }
@@ -43,7 +44,7 @@ static const HouseDef HOUSE_DEFS[HOUSE_VARIANTS] = {
         0, 0, 0
     },
     {
-        64, 60, 3,
+        64, 60, 2, 14, 60, 46, 3,
         {
             { SLOT_WINDOW_SMALL, 6, 28 },
             { SLOT_WINDOW_SMALL, 23, 28 },
@@ -52,7 +53,7 @@ static const HouseDef HOUSE_DEFS[HOUSE_VARIANTS] = {
         0, 0, 0
     },
     {
-        48, 108, 4,
+        48, 108, 2, 14, 44, 94, 4,
         {
             { SLOT_WINDOW_MEDIUM, 10, 28 },
             { SLOT_WINDOW_MEDIUM, 26, 28 },
@@ -78,6 +79,46 @@ static const int RAIL_HEIGHTS[3][4] = {
 static const Color GROUND_COLOR = (Color){ 140, 130, 190, 255 };
 static const Color STRIPE_COLOR = (Color){ 132, 122, 182, 255 };
 
+static const Color WALL_COLORS[] = {
+    { 241,  34,  34, 255 },
+    { 255, 215,  16, 255 },
+    {  22, 132,  37, 255 },
+    { 255, 153, 217, 255 },
+    { 240, 150,  30, 255 },
+    { 120, 190, 235, 255 },
+    {  40, 180, 170, 255 },
+    { 190, 160, 230, 255 },
+    { 250, 140, 120, 255 },
+    { 150, 220, 170, 255 },
+    { 250, 235, 190, 255 },
+    { 170, 210,  60, 255 },
+    { 140,  70, 170, 255 },
+    { 210, 100,  60, 255 },
+    { 255, 240, 120, 255 },
+    {  70, 130, 200, 255 }
+};
+#define WALL_COLOR_COUNT (int)(sizeof(WALL_COLORS) / sizeof(WALL_COLORS[0]))
+
+// Ponto de extensao para evitar combinacoes ruins entre parede e esquadrias.
+static bool WallColorLooksOk(int wallIndex, int setNumber)
+{
+    (void)wallIndex;
+    (void)setNumber;
+    return true;
+}
+
+static int PickWallColor(int previous, int setNumber)
+{
+    for (int attempt = 0; attempt < WALL_COLOR_COUNT * 2; attempt++)
+    {
+        int index = GetRandomValue(0, WALL_COLOR_COUNT - 1);
+        if (index != previous && WallColorLooksOk(index, setNumber))
+            return index;
+    }
+
+    return (previous + 1) % WALL_COLOR_COUNT;
+}
+
 static void SpawnHouse(Background *bg)
 {
     if (bg->count >= MAX_HOUSES) return;
@@ -92,6 +133,10 @@ static void SpawnHouse(Background *bg)
 
     house->variant = variant;
     house->setNumber = GetRandomValue(1, ASSET_COUNT);
+    house->wallColor = PickWallColor(
+        bg->count > 0 ? bg->houses[bg->count - 1].wallColor : -1,
+        house->setNumber
+    );
 
     int gap = 0;
     if (bg->count > 0 && GetRandomValue(1, 100) > HOUSE_TOUCH_CHANCE)
@@ -178,6 +223,14 @@ static void DrawHouse(const House *house, const Assets *assets)
     int houseY = (int)roundf(house->y);
 
     DrawTextureEx(assets->house[house->variant], (Vector2){ (float)houseX, (float)houseY }, 0.0f, ART_SCALE, WHITE);
+
+    DrawRectangle(
+        houseX + def->wallX * ART_SCALE,
+        houseY + def->wallY * ART_SCALE,
+        def->wallW * ART_SCALE,
+        def->wallH * ART_SCALE,
+        WALL_COLORS[house->wallColor]
+    );
 
     for (int i = 0; i < def->slotCount; i++)
     {

@@ -21,6 +21,7 @@
 typedef struct {
     int variant;
     int setNumber;
+    int wallColor;
     float x;
     float y;
     bool hasRail;
