@@ -1,5 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
+#define SIDEWALK_Y 336  // Altura onde terminam as casas e começa o calçadão
+#define GROUND_Y   392
 
 #include "raylib.h"
 
@@ -7,8 +9,8 @@
 #define SCREEN_HEIGHT 450
 #define GROUND_Y 360
 
-#define SPEED_START 220.0f
-#define SPEED_ACCEL 8.0f
+#define SPEED_START 170.0f
+#define SPEED_ACCEL 4.0f
 #define SPEED_MAX 800.0f
 #define SCORE_FACTOR 0.05f
 

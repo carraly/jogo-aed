@@ -30,7 +30,13 @@ void PlayerUpdate(Player *player, float dt)
     player->ducking = downHeld;
 
     float gravity = GRAVITY;
-    if (!player->onGround && downHeld) gravity *= FAST_FALL_MULT;
+    if (!player->onGround)
+    {
+        if (downHeld)
+            gravity *= FAST_FALL_MULT;
+        else if (jumpHeld && player->vy > -60.0f)
+            gravity *= 0.55f;
+    }
 
     player->vy += gravity * dt;
     player->y += player->vy * dt;
