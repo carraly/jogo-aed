@@ -24,6 +24,7 @@ typedef struct {
     Texture2D obstacleAir;
     Texture2D sky;
     Texture2D windowBig[ASSET_COUNT];
+    Texture2D sidewalk;
 } Assets;
 
 void AssetsLoad(Assets *assets);

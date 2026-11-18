@@ -48,7 +48,7 @@ typedef struct {
 void BackgroundReset(Background *bg);
 void BackgroundUpdate(Background *bg, float dt, float speed);
 void BackgroundDrawHouses(const Background *bg, const Assets *assets);
-void BackgroundDrawGround(const Background *bg);
+void BackgroundDrawGround(const Background *bg, const Assets *assets);
 void BackgroundDrawSky(const Background *bg, const Assets *assets);
 
 #endif

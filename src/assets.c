@@ -40,6 +40,7 @@ void AssetsLoad(Assets *assets)
 
         snprintf(path, sizeof path, "%sassets/windows/window-big%d.png", base, i + 1);
         LoadPointTexture(&assets->windowBig[i], path);
+
     }
 
     snprintf(path, sizeof path, "%sassets/character/character-running.png", base);
@@ -68,6 +69,9 @@ void AssetsLoad(Assets *assets)
 
     snprintf(path, sizeof path, "%sassets/cenario/ceu.png", base);
     LoadPointTexture(&assets->sky, path);
+
+    snprintf(path, sizeof path, "%sassets/cenario/calcadao.png", base);
+    LoadPointTexture(&assets->sidewalk, path);
     
 }
 
@@ -83,6 +87,7 @@ void AssetsUnload(Assets *assets)
         UnloadTexture(assets->railMedium[i]);
         UnloadTexture(assets->railBig[i]);
         UnloadTexture(assets->windowBig[i]);
+        UnloadTexture(assets->sidewalk);
     }
 
     UnloadTexture(assets->obstacle1);

@@ -1,6 +1,7 @@
 #include "background.h"
 #include "assets.h"
 #include <math.h>
+
 #define SKY_SCROLL_SPEED 15.0f // Pixels virtuais por segundo (bem devagar)
 
 typedef struct
@@ -35,9 +36,6 @@ static const int RAIL_HEIGHTS[3][4] = {
     {18, 14, 18, 23},
     {18, 14, 18, 22},
     {18, 14, 18, 26}};
-
-static const Color GROUND_COLOR = (Color){140, 130, 190, 255};
-static const Color STRIPE_COLOR = (Color){132, 122, 182, 255};
 
 static const Color WALL_COLORS[] = {
     {241, 34, 34, 255},
@@ -98,7 +96,7 @@ static void SpawnHouse(Background *bg)
         house->setNumber);
 
     house->x = bg->rightEdge;
-    house->y = GROUND_Y - def->height * ART_SCALE;
+    house->y = SIDEWALK_Y - def->height * ART_SCALE;
     house->hasRail = def->hasRailRow && GetRandomValue(1, 100) <= RAIL_CHANCE;
     house->railStyle = GetRandomValue(1, ASSET_COUNT);
 
@@ -131,7 +129,6 @@ static void SpawnHouse(Background *bg)
             else
                 house->slotKinds[i] = SLOT_WINDOW_BIG;
         }
-
     }
 
     bg->count++;
@@ -146,7 +143,7 @@ void BackgroundReset(Background *bg)
     bg->skyScrollX = 0.0f;
     bg->lastVariant = -1;
 
-    while (bg->rightEdge < SCREEN_WIDTH + HOUSE_SPAWN_MARGIN)
+    while (bg->rightEdge < SCREEN_WIDTH + HOUSE_SPAWN_MARGIN && bg->count < MAX_HOUSES)
         SpawnHouse(bg);
 }
 
@@ -177,7 +174,7 @@ void BackgroundUpdate(Background *bg, float dt, float speed)
     else
         bg->rightEdge -= shift;
 
-    while (bg->rightEdge < SCREEN_WIDTH + HOUSE_SPAWN_MARGIN)
+    while (bg->rightEdge < SCREEN_WIDTH + HOUSE_SPAWN_MARGIN && bg->count < MAX_HOUSES)
         SpawnHouse(bg);
 }
 
@@ -299,13 +296,26 @@ void BackgroundDrawHouses(const Background *bg, const Assets *assets)
         DrawHouse(&bg->houses[i], assets);
 }
 
-void BackgroundDrawGround(const Background *bg)
+void BackgroundDrawGround(const Background *bg, const Assets *assets)
 {
-    DrawRectangle(0, GROUND_Y, SCREEN_WIDTH, SCREEN_HEIGHT - GROUND_Y, GROUND_COLOR);
+    DrawRectangle(0, SIDEWALK_Y, SCREEN_WIDTH, SCREEN_HEIGHT - SIDEWALK_Y, (Color){110, 100, 140, 255});
 
-    int offset = (int)bg->scrollX % GROUND_STRIPE_WIDTH;
-    for (int x = -offset; x < SCREEN_WIDTH; x += GROUND_STRIPE_WIDTH)
-        DrawRectangle(x, GROUND_Y, GROUND_STRIPE_WIDTH / 2, SCREEN_HEIGHT - GROUND_Y, STRIPE_COLOR);
+    if (assets->sidewalk.id == 0)
+        return;
 
-    DrawRectangle(0, GROUND_Y, SCREEN_WIDTH, 2, (Color){110, 100, 160, 255});
+    int tileWidth = assets->sidewalk.width * ART_SCALE;
+    if (tileWidth <= 0)
+        return;
+
+    int offset = (int)bg->scrollX % tileWidth;
+
+    for (int x = -offset; x < SCREEN_WIDTH; x += tileWidth)
+    {
+        DrawTextureEx(
+            assets->sidewalk,
+            (Vector2){(float)x, (float)SIDEWALK_Y},
+            0.0f,
+            ART_SCALE,
+            WHITE);
+    }
 }

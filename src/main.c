@@ -170,7 +170,7 @@ static void DrawScene(const Game *game)
     ClearBackground(SKY_COLOR);
     BackgroundDrawSky(&game->background, &game->assets);
     BackgroundDrawHouses(&game->background, &game->assets);
-    BackgroundDrawGround(&game->background);
+    BackgroundDrawGround(&game->background, &game->assets);
     ObstaclesDraw(&game->obstacles, &game->assets);
     PlayerDraw(&game->player, &game->assets);
 }
@@ -180,7 +180,7 @@ static void DrawMenu(const Game *game)
     ClearBackground(SKY_COLOR);
     BackgroundDrawSky(&game->background, &game->assets);
     BackgroundDrawHouses(&game->background, &game->assets);
-    BackgroundDrawGround(&game->background);
+    BackgroundDrawGround(&game->background, &game->assets);
 
     DrawTextureEx(
         game->assets.playerIdle,
