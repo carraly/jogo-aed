@@ -9,10 +9,14 @@ ifeq ($(OS),Windows_NT)
     # Configurações para Windows
     LDFLAGS = -L lib/windows -lraylib -lopengl32 -lgdi32 -lwinmm
     TARGET = jogo-aed.exe
+    RM = del /Q
+    CLEAN_FILES = $(subst /,\,$(OBJ) $(DEP) $(TARGET))
 else
     # Configurações para Linux
     LDFLAGS = -L lib/linux -lraylib -lm -lpthread -ldl -lrt
     TARGET = jogo-aed
+    RM = rm -f
+    CLEAN_FILES = $(OBJ) $(DEP) $(TARGET)
 endif
 
 # Encontra todos os arquivos .c na pasta src/
@@ -39,7 +43,7 @@ run: $(TARGET)
 
 # Regra para limpar os arquivos compilados
 clean:
-	rm -f $(OBJ) $(DEP) $(TARGET)
+	-$(RM) $(CLEAN_FILES)
 
 # Declara as regras que não são arquivos físicos
 .PHONY: all run clean
