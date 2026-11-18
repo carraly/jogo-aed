@@ -1,5 +1,6 @@
 #include "background.h"
 #include <math.h>
+#define SKY_SCROLL_SPEED 15.0f // Pixels virtuais por segundo (bem devagar)
 
 typedef enum {
     SLOT_WINDOW_SMALL,
@@ -156,6 +157,7 @@ void BackgroundReset(Background *bg)
     bg->count = 0;
     bg->rightEdge = 0.0f;
     bg->scrollX = 0.0f;
+    bg->skyScrollX = 0.0f;
     bg->lastVariant = -1;
 
     while (bg->rightEdge < SCREEN_WIDTH + HOUSE_SPAWN_MARGIN)
@@ -166,6 +168,7 @@ void BackgroundUpdate(Background *bg, float dt, float speed)
 {
     float shift = speed * dt;
     bg->scrollX += shift;
+    bg->skyScrollX += SKY_SCROLL_SPEED * dt;
 
     for (int i = 0; i < bg->count;)
     {
@@ -272,6 +275,27 @@ static void DrawHouse(const House *house, const Assets *assets)
         DrawTextureEx(
             texture,
             (Vector2){ (float)(houseX + railX * ART_SCALE), (float)(houseY + railY * ART_SCALE) },
+            0.0f,
+            ART_SCALE,
+            WHITE
+        );
+    }
+}
+
+void BackgroundDrawSky(const Background *bg, const Assets *assets)
+{
+    if (assets->sky.id == 0) return;
+
+    int tileWidth = assets->sky.width * ART_SCALE;
+    if (tileWidth <= 0) return;
+
+    int offset = (int)bg->skyScrollX % tileWidth;
+
+    for (int x = -offset; x < SCREEN_WIDTH; x += tileWidth)
+    {
+        DrawTextureEx(
+            assets->sky,
+            (Vector2){ (float)x, 0.0f },
             0.0f,
             ART_SCALE,
             WHITE

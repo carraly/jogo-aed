@@ -168,6 +168,7 @@ static void UpdateRanking(Game *game)
 static void DrawScene(const Game *game)
 {
     ClearBackground(SKY_COLOR);
+    BackgroundDrawSky(&game->background, &game->assets);
     BackgroundDrawHouses(&game->background, &game->assets);
     BackgroundDrawGround(&game->background);
     ObstaclesDraw(&game->obstacles, &game->assets);
@@ -177,6 +178,7 @@ static void DrawScene(const Game *game)
 static void DrawMenu(const Game *game)
 {
     ClearBackground(SKY_COLOR);
+    BackgroundDrawSky(&game->background, &game->assets);
     BackgroundDrawHouses(&game->background, &game->assets);
     BackgroundDrawGround(&game->background);
 

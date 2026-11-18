@@ -34,11 +34,13 @@ typedef struct {
     float rightEdge;
     float scrollX;
     int lastVariant;
+    float skyScrollX;
 } Background;
 
 void BackgroundReset(Background *bg);
 void BackgroundUpdate(Background *bg, float dt, float speed);
 void BackgroundDrawHouses(const Background *bg, const Assets *assets);
 void BackgroundDrawGround(const Background *bg);
+void BackgroundDrawSky(const Background *bg, const Assets *assets);
 
 #endif
